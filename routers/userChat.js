@@ -1,6 +1,6 @@
 const express = require("express")
 const router = express.Router()
-const userChatController = require("../controllers/userChatController")
+const userChatController = require("../controllers/UserChatController")
 
 router.post("/send-msg-to-admin", userChatController.sendMsgToAdmin)
 router.post("/send-msg-to-user", userChatController.sendMsgToUser)
