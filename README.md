@@ -1,1 +1,1 @@
-# MediGood_BE
+# MEDI-GOOD
