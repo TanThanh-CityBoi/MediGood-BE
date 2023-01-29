@@ -1,6 +1,8 @@
 const Product = require("../models/product")
 const FilterConverter = require("../utils/filterConverter")
 
+var mongoose = require("mongoose")
+const db = mongoose.connection
 class ProductController {
   getList = async (req, res) => {
     const { query } = req
@@ -174,6 +176,34 @@ class ProductController {
     } catch (error) {
       res.status(400).send(error.message)
     }
+  }
+
+  getRecommendProductBaseOnCurrentProductId = async (req, res) => {
+    const id = req.query.id
+    const quantity = req.query.quantity || 10
+    const similar = await db
+      .collection("similarityMatrix")
+      .findOne({ productId: id })
+    if (!similar) {
+      res
+        .status(409)
+        .send({ success: false, message: "Notfound product with given Id" })
+    }
+    let refineSimilar = similar.similarMatrix
+      .filter((val) => val.productCompareId != id)
+      .sort((val1, val2) => val2.similarVal - val1.similarVal)
+      .slice(0, quantity)
+    let topNId = refineSimilar.map((val) => val.productCompareId)
+    let listProduct = [Array.from(Array(10).keys())]
+    const allProduct = await Product.find({})
+    for (const product of allProduct) {
+      const indexInTopN = topNId.indexOf(String(product._id))
+      if (indexInTopN !== -1) {
+        listProduct[indexInTopN] = product
+      }
+    }
+
+    res.status(200).send({ success: true, listProduct: listProduct })
   }
 }
 
