@@ -54,6 +54,7 @@ class UserController {
     // console.log("vao r ne")
     const { email } = res.locals.data
     const newCartItem = req.body
+    console.log({email, newCartItem})
     // newCartItem =
     //   {
     //     product: _id của product
@@ -63,9 +64,9 @@ class UserController {
     //
     console
       .log({ email, newCartItem })
-      // User.findOne({ email: email })
+      User.findOne({ email: email })
       .then((user) => {
-        // console.log({ user })
+        console.log({ user })
         let isExist = false
         const editedCart = user.cart.map((item) => {
           if (item.product == newCartItem.product) {
@@ -77,11 +78,12 @@ class UserController {
         if (!isExist) {
           editedCart.push(newCartItem)
         }
-        // console.log({ editedCart })
+        console.log({ editedCart })
         user.cart = editedCart
         user
           .save()
           .then((data) => {
+            console.log({data});
             res.status(200).send(
               JSON.stringify({
                 data
@@ -89,6 +91,7 @@ class UserController {
             )
           })
           .catch((error) => {
+            console.log(`error ${error}`)
             throw new Error("System failure!")
           })
       })
