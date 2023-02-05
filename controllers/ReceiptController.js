@@ -63,24 +63,16 @@ class ReceiptController {
     try {
       const receipt = req.body
       const authorizationHeader = req.headers["authorization"]
-      // console.log({ authorizationHeader })
       if (authorizationHeader) {
         const token = authorizationHeader?.split(" ")[1]
         const reqData = JWTVerify(token)
-        // console.log({
-        //   token,
-        //   reqData
-        // })
         receipt.creater = reqData.decoded.id
       }
 
       const _receipt = new Receipt({
         ...receipt
       })
-
-      // console.log("debug 2: ", _receipt)
       _receipt.save()
-
       User.updateOne({ _id: _receipt.creater }, { cart: [] }).exec()
       res.status(200).send(JSON.stringify({ data: _receipt }))
     } catch (error) {
